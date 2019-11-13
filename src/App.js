@@ -36,7 +36,8 @@ class App extends React.Component {
 
         var xhr = new XMLHttpRequest()
 
-        xhr.open('POST', 'https://echo-api-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message')
+        xhr.open('POST', 'http://api-server-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message');
+        xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(JSON.stringify({ speed: event.target.value }))
     }
 
