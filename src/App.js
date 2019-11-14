@@ -6,9 +6,9 @@ import {
     isMobile
 } from "react-device-detect";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container,Row,Col } from 'reactstrap';
+import { Container,Row,Col,Button } from 'reactstrap';
 
-
+const API_MQTTMSG_URL = "http://api-server-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message";
 
 class App extends React.Component {
     constructor(props) {
@@ -36,7 +36,7 @@ class App extends React.Component {
 
         var xhr = new XMLHttpRequest()
 
-        xhr.open('POST', 'http://api-server-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message');
+        xhr.open('POST', API_MQTTMSG_URL);
         xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(JSON.stringify({ speed: event.target.value }))
     }
@@ -47,9 +47,27 @@ class App extends React.Component {
             carSteering: event.target.value
         })
 
+        var xhr = new XMLHttpRequest()
+
+        xhr.open('POST', API_MQTTMSG_URL);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify({ steering: event.target.value }))
+
+    }
+
+
+    startRequestFloodWith = (numberOfRequests) => {
+        var xhr = new XMLHttpRequest()
+        for (let i = 0; i < numberOfRequests; i++) {
+
+            xhr.open('POST', API_MQTTMSG_URL);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify({ speed: 0 }))
+        }
 
 
     }
+
 
 
     //subscribe to react state changes and send them to mqtt
@@ -85,6 +103,19 @@ class App extends React.Component {
                                 value={this.state.carSteering}
                                 onChange={this.handleCarSteering}
                                 step="1"/>
+                        </Col>
+                    </Row>
+                </Container>
+                <Container>
+                    <Row>
+                        <Col>
+                            <Button onClick={() => this.startRequestFloodWith(100)} >Send 100 Requests</Button>
+                        </Col>
+                        <Col>
+                            <Button onClick={() => this.startRequestFloodWith(1000)} >Send 1.000 Requests</Button>
+                        </Col>
+                        <Col>
+                            <Button onClick={() => this.startRequestFloodWith(10000)} >Send 10.000 Requests</Button>
                         </Col>
                     </Row>
                 </Container>
