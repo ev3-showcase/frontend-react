@@ -89,7 +89,7 @@ class App extends React.Component {
                             <input
                                 id="speedInput"
                                 type="range"
-                                min="0" max="90"
+                                min="-90" max="90"
                                 value={this.state.carSpeed}
                                 onChange={this.handleCarSpeed}
                                 step="1"/>
