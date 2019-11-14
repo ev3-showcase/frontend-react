@@ -57,9 +57,10 @@ class App extends React.Component {
 
 
     startRequestFloodWith = (numberOfRequests) => {
-        var xhr = new XMLHttpRequest()
-        for (let i = 0; i < numberOfRequests; i++) {
 
+        for (let i = 0; i < numberOfRequests; i++) {
+            var xhr = new XMLHttpRequest()
+            console.log("flood with: ", i)
             xhr.open('POST', API_MQTTMSG_URL);
             xhr.setRequestHeader("Content-Type", "application/json");
             xhr.send(JSON.stringify({ speed: 0 }))
