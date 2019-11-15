@@ -1,6 +1,3 @@
-* {
-  box-sizing: border-box;
-}
 
 
 .joystickContainer {
@@ -22,7 +19,7 @@
 .joystickContainer > div {
   width: 100px;
   height: 100px;
-  background: hotpink;
+  background: #E20074;
   border-radius: 50%;
   cursor: -webkit-grab;
   display: flex;
