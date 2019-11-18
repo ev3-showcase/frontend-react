@@ -6,12 +6,9 @@ import { Container,Row,Col,Button } from 'reactstrap';
 import clamp from 'lodash-es/clamp'
 import { useSpring, animated } from 'react-spring'
 import { useGesture } from 'react-with-gesture'
-import safeGet from "lodash-es/_safeGet";
 
 const DEBUG_PRINT = false;
 const API_MQTTMSG_URL = "http://api-server-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message";
-
-
 
 class App extends React.Component {
     constructor(props) {
@@ -26,7 +23,7 @@ class App extends React.Component {
     }
 
     postUpdateToApi = () => {
-        let carData = {speed:this.state.carSpeed,steering:this.state.carSteering}
+        let carData = {speed:this.state.carSpeed,steering:this.state.carSteering};
         axios.post(API_MQTTMSG_URL, carData, {headers: {'Content-Type': 'application/json'}})
             .then(res => {
                 if(DEBUG_PRINT){
@@ -77,12 +74,10 @@ class App extends React.Component {
     };
 
     updateStateFromChild = (content) => {
-
-        if((content.speed != this.state.carSpeed) || (content.steering != this.state.carSteering)){
+        if((content.speed !== this.state.carSpeed) || (content.steering !== this.state.carSteering)){
             if(DEBUG_PRINT){
                 console.log(content)
             }
-
             this.setState(
                 this.setState({
                     carSpeed: content.speed,
@@ -90,17 +85,11 @@ class App extends React.Component {
                 },() => this.postUpdateToApi())
             )
         }
-
     };
-
 
     render(){
         return (
             <div style={{height:"100vh"}} className="App">
-
-
-
-
                 <Container style={{height:"50%"}}>
                     <Row>
                         <Col>
@@ -146,41 +135,23 @@ class App extends React.Component {
                         </Col>
                     </Row>
                 </Container>
-
                 <Container fluid={true} style={{height:"50%", backgroundColor:"#eee"}} className={"joystickContainer"}>
-
                     <Joystick returnToParent={(content) => this.updateStateFromChild(content) }/>
-
-
-
-
                 </Container>
-
             </div>
         );
-
     }
-
 }
 
 export default App;
 
-
 function Joystick(props) {
-    const [{ xy }, set] = useSpring(() => ({ xy: [0, 0] }))
+    const [{ xy }, set] = useSpring(() => ({ xy: [0, 0] }));
     const bind = useGesture(({ down, delta, velocity }) => {
-        velocity = clamp(velocity, 1, 8)
-        set({ xy: down ? delta : [0, 0], config: { mass: velocity, tension: 500 * velocity, friction: 50 } })
-
-
-
+        velocity = clamp(velocity, 1, 8);
+        set({ xy: down ? delta : [0, 0], config: { mass: velocity, tension: 500 * velocity, friction: 50 } });
         const yValue = Math.round(100*(-1*((delta[1]*4)/window.innerHeight)));
         const xValue = Math.round(100*((delta[0]*2)/window.innerWidth));
-
-
-
-
-
         if(down){
             //console.log({speed:yValue,steering:xValue})
             props.returnToParent({speed:yValue,steering:xValue})
@@ -188,8 +159,6 @@ function Joystick(props) {
             props.returnToParent({speed:0,steering:0})
             //console.log("STOP CAR!")
         }
-
-
-    })
+    });
     return <animated.div {...bind()} style={{ transform: xy.interpolate((x, y) => `translate3d(${x}px,${y}px,0)`) }} />
 }
