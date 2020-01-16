@@ -1,4 +1,8 @@
 
+body {
+  overflow:hidden;
+  position: fixed;
+}
 
 .joystickContainer {
   margin: 0;
