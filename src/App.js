@@ -8,7 +8,7 @@ import { useSpring, animated } from 'react-spring'
 import { useGesture } from 'react-with-gesture'
 
 const DEBUG_PRINT = false;
-const API_MQTTMSG_URL = "http://api-server-fk-sc.aotp012.mcs-paas.io/api/v1/publish/message";
+const API_MQTTMSG_URL = "http://api-server-legoracer.apps.p005.otc.mcs-paas.io/api/v1/publish/message";
 
 class App extends React.Component {
     constructor(props) {
