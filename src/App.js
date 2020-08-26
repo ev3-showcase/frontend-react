@@ -1,11 +1,14 @@
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { scaleLinear } from 'd3-scale';
 import clamp from 'lodash-es/clamp';
 import React from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useGesture } from 'react-with-gesture';
 import { Col, Container, Row } from 'reactstrap';
 import './index.css';
+var d3 = require('d3');
+var mqtt = require('mqtt');
 
 const DEBUG_PRINT = false;
 const API_MQTTMSG_URL = 'http://api-legoracer.apps.p005.otc.mcs-paas.io/api/v1/publish/message';
@@ -19,6 +22,102 @@ class App extends React.Component {
       APISuccess: 0,
       APIFailed: 0,
     };
+
+    let points = [];
+
+    var width = 960,
+      height = 500,
+      radius = Math.min(width, height) / 2 - 30;
+
+    var r = scaleLinear().domain([0, 1]).range([0, radius]);
+
+    var line = d3
+      .lineRadial()
+      .radius(function (d) {
+        return r(d[1]);
+      })
+      .angle(function (d) {
+        return -d[0] + Math.PI / 2;
+      });
+
+    var svg = d3
+      .select('test')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+    var gr = svg.append('g').attr('class', 'r axis').selectAll('g').data(r.ticks(3).slice(1)).enter().append('g');
+
+    gr.append('circle').attr('r', r);
+
+    var ga = svg
+      .append('g')
+      .attr('class', 'a axis')
+      .selectAll('g')
+      .data(d3.range(0, 360, 30))
+      .enter()
+      .append('g')
+      .attr('transform', function (d) {
+        return 'rotate(' + -d + ')';
+      });
+
+    ga.append('line').attr('x2', radius);
+
+    var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    var line = d3
+      .lineRadial()
+      .radius(function (d) {
+        return r(d[1]);
+      })
+      .angle(function (d) {
+        return -d[0] + Math.PI / 2;
+      });
+
+    var client = mqtt.connect('ws://message-broker-mqtt-websocket-legoracer.apps.p005.otc.mcs-paas.io/mqtt', {
+      port: 80,
+      protocol: 'mqtt',
+    });
+
+    client.on('connect', function () {
+      client.subscribe('stats/lidar', function (err) {
+        console.log(err);
+      });
+    });
+
+    client.on('message', function (topic, message) {
+      // message is Buffer
+      if (topic === 'stats/lidar') {
+        let line = message.toString().split(',');
+        points.push([Number.parseFloat(line[2]) * (Math.PI / 180), Number.parseFloat(line[3]) / 10000]);
+        if (points.length >= 600) {
+          console.log(points);
+          svg.selectAll('circle').remove();
+          svg
+            .selectAll('point')
+            .data(points)
+            .enter()
+            .append('circle')
+            .attr('class', 'point')
+            .attr('transform', function (d) {
+              // get angle and radius
+              var an = d[0],
+                ra = r(d[1]),
+                x = ra * Math.cos(an),
+                y = ra * Math.sin(an);
+              return 'translate(' + [x, y] + ')';
+            })
+            .attr('r', 2)
+            .attr('fill', 'grey');
+
+          points = [];
+        }
+      }
+      // console.log(topic + ':' + message.toString());
+      // client.end();
+    });
   }
 
   postUpdateToApi = () => {

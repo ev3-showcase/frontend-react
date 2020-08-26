@@ -1,7 +1,6 @@
-
 body {
-  overflow:hidden;
-  position: fixed;
+  /* overflow: hidden;
+  position: fixed; */
 }
 
 .joystickContainer {
@@ -12,7 +11,7 @@ body {
   overflow: hidden;
   user-select: none;
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto,
-  segoe ui, arial, sans-serif;
+    segoe ui, arial, sans-serif;
   font-size: 12px;
   font-weight: 600;
   display: flex;
@@ -23,7 +22,7 @@ body {
 .joystickContainer > div {
   width: 100px;
   height: 100px;
-  background: #E20074;
+  background: #e20074;
   border-radius: 50%;
   cursor: -webkit-grab;
   display: flex;
@@ -35,4 +34,31 @@ body {
 
 .joystickContainer > div:active {
   cursor: -webkit-grabbing;
+}
+
+.frame {
+  fill: none;
+  stroke: #000;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis line,
+.axis circle {
+  fill: none;
+  stroke: steelblue;
+  stroke-dasharray: 4;
+}
+
+.axis:last-of-type circle {
+  stroke: steelblue;
+  stroke-dasharray: none;
+}
+
+.line {
+  fill: none;
+  stroke: orange;
+  stroke-width: 1px;
 }
