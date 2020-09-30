@@ -21,7 +21,10 @@ class App extends React.Component {
       carSteering: 0,
       APISuccess: 0,
       APIFailed: 0,
+      selectedDevice: 'car-cloudhub',
     };
+
+    this.handleChange = this.handleChange.bind(this);
 
     let points = [];
 
@@ -121,7 +124,11 @@ class App extends React.Component {
   }
 
   postUpdateToApi = () => {
-    let carData = { speed: this.state.carSpeed, steering: this.state.carSteering };
+    let carData = {
+      id: this.state.selectedDevice,
+      speed: this.state.carSpeed,
+      steering: this.state.carSteering,
+    };
     axios
       .post(API_MQTTMSG_URL, carData, { headers: { 'Content-Type': 'application/json' } })
       .then((res) => {
@@ -201,10 +208,20 @@ class App extends React.Component {
     }
   };
 
+  handleChange(event) {
+    this.setState({ selectedDevice: event.target.value });
+  }
+
   render() {
     return (
       <div style={{ height: '100vh' }} className="App">
         <Container style={{ height: '50%' }}>
+          <Row>
+            <select value={this.state.selectedDevice} onChange={this.handleChange}>
+              <option value="car-bdsp">BDSP Car</option>
+              <option value="car-cloudhub">CloudHub Car</option>
+            </select>
+          </Row>
           <Row>
             <Col>
               <p>Success API requests: {this.state.APISuccess}</p>
