@@ -25,9 +25,10 @@ class App extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
 
-    var client = mqtt.connect('ws://message-broker-mqtt-websocket-legoracer.apps.p005.otc.mcs-paas.io/mqtt', {
-      port: 80,
-      protocol: 'mqtt',
+    var client = mqtt.connect(`wss://${process.env.REACT_APP_MQTT_HOSTNAME}`, {
+      port: 443,
+      path: '/mqtt',
+      protocol: 'wss',
     });
 
     client.on('connect', function () {
