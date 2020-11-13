@@ -6,11 +6,9 @@ import { animated, useSpring } from 'react-spring';
 import { useGesture } from 'react-with-gesture';
 import { Col, Container, Row } from 'reactstrap';
 import './index.css';
-var d3 = require('d3');
 var mqtt = require('mqtt');
 
 const DEBUG_PRINT = false;
-const API_MQTTMSG_URL = 'http://api-legoracer.apps.p005.otc.mcs-paas.io/api/v1/publish/message';
 
 class App extends React.Component {
   constructor(props) {
@@ -53,7 +51,7 @@ class App extends React.Component {
       steering: this.state.carSteering,
     };
     axios
-      .post(API_MQTTMSG_URL, carData, { headers: { 'Content-Type': 'application/json' } })
+      .post(process.env.REACT_APP_API_SERVER, carData, { headers: { 'Content-Type': 'application/json' } })
       .then((res) => {
         if (DEBUG_PRINT) {
           console.log(res);
