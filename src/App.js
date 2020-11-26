@@ -1,10 +1,9 @@
-import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import clamp from 'lodash-es/clamp';
 import React from 'react';
 import { animated, useSpring } from 'react-spring';
 import { useGesture } from 'react-with-gesture';
-import { Col, Container, Row } from 'reactstrap';
+import { Button, Col, Container, Row } from 'reactstrap';
 import './index.css';
 var mqtt = require('mqtt');
 
@@ -19,6 +18,7 @@ class App extends React.Component {
       APISuccess: 0,
       APIFailed: 0,
       selectedDevice: 'car-cloudhub',
+      client: null,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -27,44 +27,48 @@ class App extends React.Component {
       port: 443,
       path: '/mqtt',
       protocol: 'wss',
+      clientId: 'remotecontrol_' + Math.random().toString(16).substr(2, 8),
+    });
+    client.on('connect', () => {
+      this.state.client = client;
     });
 
-    client.on('connect', function () {
-      client.subscribe('stats/lidar', function (err) {
-        console.log(err);
-      });
+    client.stream.on('error', (error) => {
+      debugger;
     });
 
-    client.on('message', function (topic, message) {
-      // message is Buffer
-      if (topic === 'stats/lidar') {
-      }
-      // console.log(topic + ':' + message.toString());
-      // client.end();
-    });
+    // this.state.client.on('connect', function () {
+
+    // });
   }
 
   postUpdateToApi = () => {
-    let carData = {
-      id: this.state.selectedDevice,
-      speed: this.state.carSpeed,
-      steering: this.state.carSteering,
-    };
-    axios
-      .post(process.env.REACT_APP_API_SERVER, carData, { headers: { 'Content-Type': 'application/json' } })
-      .then((res) => {
-        if (DEBUG_PRINT) {
-          console.log(res);
-          console.log(res.data);
-        }
-        this.setState({ APISuccess: this.state.APISuccess + 1 });
-      })
-      .catch((error) => {
-        this.setState({ APIFailed: this.state.APIFailed + 1 });
-        if (DEBUG_PRINT) {
-          console.log(error.response);
-        }
-      });
+    if (this.state.client) {
+      this.state.client.publish(`${this.state.selectedDevice}/car/speed`, this.state.carSpeed.toString());
+      this.state.client.publish(`${this.state.selectedDevice}/car/steering`, this.state.carSteering.toString());
+    }
+    this.setState({ APISuccess: this.state.APISuccess + 1 });
+
+    // let carData = {
+    //   id: this.state.selectedDevice,
+    //   speed: this.state.carSpeed,
+    //   steering: this.state.carSteering,
+    // };
+    // axios
+    //   .post(process.env.REACT_APP_API_SERVER, carData, { headers: { 'Content-Type': 'application/json' } })
+    //   .then((res) => {
+    //     if (DEBUG_PRINT) {
+    //       console.log(res);
+    //       console.log(res.data);
+    //     }
+    //     this.setState({ APISuccess: this.state.APISuccess + 1 });
+    //   })
+    //   .catch((error) => {
+    //     this.setState({ APIFailed: this.state.APIFailed + 1 });
+    //     if (DEBUG_PRINT) {
+    //       console.log(error.response);
+    //     }
+    //   });
   };
 
   //reset car values
@@ -175,6 +179,9 @@ class App extends React.Component {
                 onChange={this.handleCarSteering}
                 step="1"
               />
+            </Col>
+            <Col>
+              <Button onClick={() => this.emergencyBreak()}>Stop</Button>
             </Col>
             {/* <Col>
                             <Row>
