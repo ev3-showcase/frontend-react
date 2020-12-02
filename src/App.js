@@ -45,7 +45,7 @@ class App extends React.Component {
   postUpdateToApi = () => {
     if (this.state.client) {
       this.state.client.publish(`${this.state.selectedDevice}/car/speed`, this.state.carSpeed.toString());
-      this.state.client.publish(`${this.state.selectedDevice}/car/steering`, this.state.carSteering.toString());
+      this.state.client.publish(`${this.state.selectedDevice}/car/steering`, (this.state.carSteering * -1).toString());
     }
     this.setState({ APISuccess: this.state.APISuccess + 1 });
 
